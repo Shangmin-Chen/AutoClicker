@@ -1,23 +1,23 @@
-# Use the official Rust image
+# Use the latest Rust image
 FROM rust:latest
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Copy only Cargo.toml and Cargo.lock for caching dependencies
+# Copy dependency files first to leverage Docker caching
 COPY Cargo.toml Cargo.lock ./
 
-# Create an empty src directory to satisfy Cargo
-RUN mkdir src
+# Create a dummy main file for dependency resolution
+RUN mkdir src && echo "fn main() {}" > src/main.rs
 
-# Pre-build dependencies for caching
+# Build dependencies
 RUN cargo build --release || true
 
-# Copy the rest of the project files
+# Copy the actual source files
 COPY . .
 
-# Build the full application
+# Build the application
 RUN cargo build --release
 
-# Default command to run the application
-CMD ["cargo", "run"]
+# Set the default command
+CMD ["./target/release/app"]
