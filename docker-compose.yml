@@ -1,16 +1,25 @@
-version: "3.8"
-
 services:
   backend:
     build:
       context: ./backend
     ports:
       - "8080:8080"
-    container_name: rustpaint-backend
+    depends_on:
+      - db
 
   frontend:
     build:
       context: ./frontend
     ports:
-      - "3000:80"
-    container_name: rustpaint-frontend
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"

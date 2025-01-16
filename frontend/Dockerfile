@@ -1,29 +1,9 @@
-# Use a lightweight Node.js image
-FROM node:16-alpine
+FROM node:latest
 
-# Set the working directory
-WORKDIR /usr/src/frontend
-
-# Copy only the package files first for caching purposes
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the frontend source code
+WORKDIR /app
 COPY . .
 
-# Build the React app
+RUN npm install
 RUN npm run build
 
-# Use a lightweight web server to serve the built files
-FROM nginx:alpine
-
-# Copy the build folder to the nginx HTML directory
-COPY --from=0 /usr/src/frontend/build /usr/share/nginx/html
-
-# Expose the port that Nginx listens on
-EXPOSE 80
-
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npx", "serve", "-s", "build", "-l", "3000"]
